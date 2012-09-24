@@ -45,7 +45,7 @@ class TestSuccessfulRun(YappTest):
         self.writeConfig('uppercase',
         """
         input_file_pattern: '*.txt'
-        command: 'python -c "import sys;sys.stdout.write(sys.stdin.read().upper())" < {input_file}'
+        command: 'python -c "import sys;open(\\"side_effect.txt\\",\\"w\\").write(\\"SIDE EFFECT\\");sys.stdout.write(sys.stdin.read().upper())" < {input_file}'
         """)
         self.copyFixture('test.txt')
         yapp.core.processDir(self.my_dir)
@@ -54,6 +54,7 @@ class TestSuccessfulRun(YappTest):
         self.assertFileDoesNotExist('uppercase', 'test.txt.working')
         self.assertFileDoesNotExist('uppercase', 'test.txt.err')
         self.assertFileExists('uppercase', 'test.txt')
+        self.assertFileExists('uppercase', 'side_effect.txt')
 
     def testFileContents(self):
         with self.fileAsString('test.txt') as input, self.fileAsString('uppercase', 'test.txt') as output:

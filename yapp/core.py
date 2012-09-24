@@ -43,8 +43,8 @@ def process(yapp_file):
         errfile = outfile+'.err'
         with open(tempfile, 'w') as tempfile_f, open(errfile, 'w') as errfile_f:
             command = config['command'].format(input_file=file)
-            ret_code = subprocess.Popen(command, bufsize=-1, stdout=tempfile_f, stderr=errfile_f, shell=True).wait()
-            #Delete the errfile if empty
+            ret_code = subprocess.Popen(command, bufsize=-1, stdout=tempfile_f, stderr=errfile_f, cwd=outdir, shell=True,).wait()
+        #Delete the errfile if empty
         if path.getsize(errfile) == 0 and ret_code == 0:
             os.remove(errfile)
         if ret_code == 0:
