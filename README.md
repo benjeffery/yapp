@@ -2,6 +2,10 @@
 
 **YAPP** is a small tool for running commands over sets of files
 
+##Installation
+
+    pip install http://github.com/benjeffery/yapp/raw/master/dist/yapp-0.1.0.tar.gz
+
 ## Usage
 
     yapp [-h] [--verbose] root_directory
