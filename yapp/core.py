@@ -39,6 +39,9 @@ def process(yapp_file):
 
     for file in files:
         outfile = path.join(outdir, path.basename(file))
+        #Check if an old outfile exists and check if it needs to be updated
+        if path.exists(outfile) and path.getmtime(outfile) > path.getmtime(file):
+            continue
         tempfile = outfile+'.working'
         errfile = outfile+'.err'
         with open(tempfile, 'w') as tempfile_f, open(errfile, 'w') as errfile_f:

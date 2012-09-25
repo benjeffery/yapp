@@ -1,9 +1,7 @@
 import contextlib
-import subprocess
 from os import path
 import unittest
 import errno
-import os
 import shutil
 import tempfile
 import yapp
@@ -83,3 +81,26 @@ class TestFailedRun(YappTest):
     def testStderrFileContents(self):
         with self.fileAsString('uppercase', 'test.txt.err') as output:
             self.assertEqual("OMG AN ERROR", output)
+
+class TestNoopOnNothingToDo(TestSuccessfulRun):
+    def setUp(self):
+        super().setUp()
+
+    def testNoop(self):
+        #Store the current mtime of the output
+        get_time = lambda: path.getmtime(path.join(self.my_dir, 'uppercase', 'test.txt'))
+        old_time = get_time()
+        yapp.core.processDir(self.my_dir)
+        self.assertEqual(old_time, get_time())
+
+class TestReprocessOnChange(TestSuccessfulRun):
+    def setUp(self):
+        super().setUp()
+
+    def testReprocess(self):
+        #Store the current mtime of the output
+        get_time = lambda: path.getmtime(path.join(self.my_dir, 'uppercase', 'test.txt'))
+        old_time = get_time()
+        self.copyFixture('test.txt')
+        yapp.core.processDir(self.my_dir)
+        self.assertNotEqual(old_time, get_time())
