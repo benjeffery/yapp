@@ -7,7 +7,9 @@ setup(
     author_email='ben.jeffery@well.ox.ac.uk',
     packages=['yapp',],
     scripts=['scripts/yapp'],
-    license='TODO', #TODO
+    license='LICENSE.TXT',
+    url="http://github.com/benjeffery/yapp",
+    description="Run commands over sets of files",
     long_description=open('README.md').read(),
     install_requires=['pyyaml',]
 )
