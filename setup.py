@@ -8,6 +8,6 @@ setup(
     packages=['yapp',],
     scripts=['scripts/yapp'],
     license='TODO', #TODO
-    long_description=open('README.txt').read(),
+    long_description=open('README.md').read(),
     install_requires=['pyyaml',]
 )
