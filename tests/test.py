@@ -10,6 +10,7 @@ from yapp import core
 class YappTest(unittest.TestCase):
     def setUp(self):
         self.my_dir = tempfile.mkdtemp()
+        self.yp = yapp.core.YappProcessor(self.my_dir)
 
     def tearDown(self):
         try:
@@ -46,7 +47,7 @@ class TestSuccessfulRun(YappTest):
         command: 'python -c "import sys;open(\\"side_effect.txt\\",\\"w\\").write(\\"SIDE EFFECT\\");sys.stdout.write(sys.stdin.read().upper())" < {input_file}'
         """)
         self.copyFixture('test.txt')
-        yapp.core.processDir(self.my_dir)
+        self.yp.process()
 
     def testFiles(self):
         self.assertFileDoesNotExist('uppercase', 'test.txt.working')
@@ -67,7 +68,7 @@ class TestFailedRun(YappTest):
             command: 'python -c "import sys;sys.stdout.write(\\"I WAS HALF WAY THROUGH THAT\\");sys.stderr.write(\\"OMG AN ERROR\\");sys.exit(127)" < {input_file}'
             """)
         self.copyFixture('test.txt')
-        yapp.core.processDir(self.my_dir)
+        self.yp.process()
 
     def testFiles(self):
         self.assertFileExists('uppercase', 'test.txt.working')
@@ -90,7 +91,7 @@ class TestNoopOnNothingToDo(TestSuccessfulRun):
         #Store the current mtime of the output
         get_time = lambda: path.getmtime(path.join(self.my_dir, 'uppercase', 'test.txt'))
         old_time = get_time()
-        yapp.core.processDir(self.my_dir)
+        self.yp.process()
         self.assertEqual(old_time, get_time())
 
 class TestReprocessOnChange(TestSuccessfulRun):
@@ -102,5 +103,17 @@ class TestReprocessOnChange(TestSuccessfulRun):
         get_time = lambda: path.getmtime(path.join(self.my_dir, 'uppercase', 'test.txt'))
         old_time = get_time()
         self.copyFixture('test.txt')
-        yapp.core.processDir(self.my_dir)
+        self.yp.process()
         self.assertNotEqual(old_time, get_time())
+
+class TestAddSecondFile(TestSuccessfulRun):
+    def setUp(self):
+        super().setUp()
+
+    def testSecondFile(self):
+        self.copyFixture('test_alt.txt')
+        self.yp.process()
+        with self.fileAsString('test_alt.txt') as input, self.fileAsString('uppercase', 'test_alt.txt') as output:
+            self.assertEqual(input.upper(), output)
+
+
