@@ -71,12 +71,12 @@ class TestFailedRun(YappTest):
         self.yp.process()
 
     def testFiles(self):
-        self.assertFileExists('uppercase', 'test.txt.working')
+        self.assertFileExists('uppercase', 'test.txt.output_before_err')
         self.assertFileExists('uppercase', 'test.txt.err')
         self.assertFileDoesNotExist('uppercase', 'test.txt')
 
     def testWorkingFileContents(self):
-        with self.fileAsString('uppercase', 'test.txt.working') as output:
+        with self.fileAsString('uppercase', 'test.txt.output_before_err') as output:
             self.assertEqual("I WAS HALF WAY THROUGH THAT", output)
 
     def testStderrFileContents(self):

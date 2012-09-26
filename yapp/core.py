@@ -57,6 +57,7 @@ class YappProcessor:
         dir = path.dirname(yapp_file)
         files = [path.join(dir,file) for file in os.listdir(dir) if fnmatch.fnmatch(file, config['input_file_pattern'])]
         self.log.info("\tFound {num} files".format(num=len(files)))
+
         outdir = yapp_file[:-len(yapp.CONFIG_EXTENSION)]
         #Make the output dir
         makeDir(outdir)
@@ -69,15 +70,21 @@ class YappProcessor:
                 continue
             tempfile = outfile+'.working'
             errfile = outfile+'.err'
+            if path.exists(tempfile):
+                self.log.info("\t\t{file} is being worked on".format(file=file))
+                continue
             self.log.info("\t\t{file} processing....".format(file=file))
             with open(tempfile, 'w') as tempfile_f, open(errfile, 'w') as errfile_f:
                 command = config['command'].format(input_file=file)
                 ret_code = subprocess.Popen(command, bufsize=-1, stdout=tempfile_f, stderr=errfile_f, cwd=outdir, shell=True,).wait()
             #Delete the errfile if empty
             if ret_code == 0:
-                self.log.info("\t\t{file} success".format(file=file))
                 os.rename(tempfile, outfile)
                 if path.getsize(errfile) == 0:
                     os.remove(errfile)
+                self.log.info("\t\t{file} success".format(file=file))
             else:
+                os.rename(tempfile, outfile+'.output_before_err')
                 self.log.warn("\t\t{file} failed with code: {code}".format(file=file, code=ret_code))
+
+
